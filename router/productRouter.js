@@ -1,9 +1,14 @@
 import express from "express"
-import { createProduct, deletProduct, getProducts } from "../controllers/productController.js";
+import { createProduct, deletProduct, getProductById, getProducts, updateProduct } from "../controllers/productController.js";
 
 const productRouter = express.Router();
-productRouter.post('/',createProduct);
+productRouter.post("/",createProduct);
 productRouter.get("/",getProducts);
-productRouter.delete("/",deletProduct);
+productRouter.get("/trending",(req,res)=>{
+    res.status(200).json({message:"This is trending products endpoint"})
+})
+productRouter.delete("/:productId",deletProduct);
+productRouter.put("/:productId",updateProduct);
+productRouter.get("/:productId",getProductById)
 
 export default productRouter;
