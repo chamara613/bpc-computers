@@ -3,10 +3,13 @@ import mongoose from 'mongoose'
 import userRouter from './router/userRouter.js'
 import productRouter from './router/productRouter.js'
 import authorization from './lib/jwtMiddleware.js'
+import cors from 'cors'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 
-
-let mongoURL = "mongodb+srv://admin:1234@cluster0.qbjvpzs.mongodb.net/?appName=Cluster0"
+let mongoURL = process.env.MONGO_URL
 mongoose.connect(mongoURL).then(
     ()=>{
         console.log("mongodd conected")
@@ -18,12 +21,13 @@ mongoose.connect(mongoURL).then(
 )
 
 let app = express() 
+app.use(cors())
 app.use(express.json())
 
 app.use(authorization)
 
-app.use("/user",userRouter)
-app.use("/products",productRouter)
+app.use("/api/user",userRouter)
+app.use("/api/products",productRouter)
 
 
 
