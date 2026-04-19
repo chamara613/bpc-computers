@@ -1,156 +1,158 @@
+
 import { isAdmin } from "./userController.js";
 import product from "../models/product.js";
 
 export async function createProduct(req,res){
-    if(isAdmin(req)){
-        res.stetus(401).json({message:"Access denied. Admin only."});
+
+    if(!isAdmin(req)){
+        res.status(403).json({message:"Access denied. Admins only."});
         return;
     }
-
     try{
-
-        const existingProduct = await product.findOne({
+        const existingProduct =  await product.findOne({
             productId : req.body.productId
-        });
+        })
 
         if(existingProduct){
-            res.status(400).json({message : "roduct with given productId already exists"});
+            res.status(400).json({message: "Product with given  productId already exists"});
             return;
         }
-        const data = {};
+        
+        const data = {}
         data.productId = req.body.productId;
 
-        if(req.body.name == null){{
-            res.status(400).json({message : "product name is required"});
+        if(req.body.name == null){
+            res.status(400).json({message: "product name is required"});
             return;
         }
         data.name = req.body.name;
-        data.description = req.body.description || "";
-        data.altName = req.body.altName || [];
-
+        data.description  = req.body.description || ""
+        data.altNames =req.body.altNames || []
 
         if(req.body.price == null){
-            res.status(400).json({
-                message : "product pris is required"});
+            res.status(400).json({message: "Product price  is required"});
             return;
         }
         data.price = req.body.price;
-        data.lebelledPrice = req.body.labellePrice || req.body.price;
-        data.catogory = req.body.catogory || "others";
-        data.images = req.body.images || [
-            "/images/defoult_prodict_1.png",
-            "/images/defoult_product_2.png",
-        ];
-        data.isVisible = req.body.isVisible;
-        data.brand = req.body.brand || "generic";
-        data.model = req.body.model || "standard";
+        data.labelledprice = req.body.labelledprice || req.body.price
+        data.category = req.body.category || ""
+       // data.images  = req.body.
+        data.brand = req.body.brand || "Generic"
+        data.model = req.body.model ||  "Standard"
 
-        const newProduct = new product(data);
+        const newProduct =  new product(data);
 
-        await newProduct.save();
+        await  newProduct.save();
 
-        res
-            .status(200)
-            .json({message : "Product created successfully", product : newProduct});
-    }
+        res.status(201).json({message:  "product created successfully", product})
 
+
+        
     }catch(error){
-        res.status(500).json({message: "Error creating product", error : error});
+        res.status(500).json({ message:  "Error creating  product", error: error});
+
     }
+
 }
 
-export async function getProducts(req,res){
+export async function getProducts(req,res) {
+
     try{
         if(isAdmin(req)){
             const products = await product.find();
-            res.status(200).json(product);
+            res.status(200).json(products);
         }else{
-            const products = await product.find({ isVisible : true});
+            const products =  await product.find({isVisible: true});
             res.status(200).json(products);
         }
-
-
     }catch(error){
-        res.status(500).json({message : "error fetchig product"})
+        res.status(500).json({
+            massage: "Error fetching products", error: error
+        });
     }
+   
 }
-
-export async function deletProduct(req,res){
-    if(isAdminr(req)){
-        res.status(403).json({message : "Acces denied. admins only."});
+export async  function  deleteProduct(req,res){
+    if(!isAdmin(req)){
+        res.status(403).json({message: "Access  denied. admins only."});
         return;
     }
     try{
-        const product = req.body.productId;
-        await product.deleteOne({productId : productId});
-        res.status(200).json({massage: "Product deleted successfully"});
+
+        const productId = req.para.productId;
+        await product.deleteOne({ productId: productId});
+        res.status(200).json({message: "product deleted successfully"});
 
     }catch(error){
-        res.status(500).json({message : "Eroor deleting product", error:error});
-
+        res.status(500).json({message: "Error deleting product",error: error})
     }
-
 }
 
-export async function updateProduct(req, res){
+export async function updateProduct(req,res){
+
     if(!isAdmin(req)){
-        res.status(403).json({message : "Access denied. Admins only."});
+        res.status(403).json({message:"Access denied. Admins only."});
         return;
     }
-
     try{
         const productId = req.params.productId;
 
-        const data = {};
+        
+        const data = {}
 
-        if (req.body.name == null){
-            res.status(400).json({message : "product name is required"});
+        if(req.body.name == null){
+            res.status(400).json({message: "product name is required"});
             return;
         }
-		data.price = req.body.price;
-		data.labelledPrice = req.body.labelledPrice || req.body.price;
-		data.category = req.body.category || "Others";
-		data.images = req.body.images || [
-			"/images/default-product-1.png",
-			"/images/default-product-2.png",
-		];
-		data.isVisible = req.body.isVisible;
-		data.brand = req.body.brand || "Generic";
-		data.model = req.body.model || "Standard";
+        data.name = req.body.name;
+        data.description  = req.body.description || ""
+        data.altNames =req.body.altNames || []
 
-        await product.updateOne({ productId: productId},data);
+        if(req.body.price == null){
+            res.status(400).json({message: "Product price  is required"});
+            return;
+        }
+        data.price = req.body.price;
+        data.labelledprice = req.body.labelledprice || req.body.price
+        data.category = req.body.category || ""
+       // data.images  = req.body.
+        data.brand = req.body.brand || "Generic"
+        data.model = req.body.model ||  "Standard"
 
-        res
-            .status(201)
-            .json({message: "product updated successfully"});
-    }catch (error){
-        res.status(500).json({ message: "Error updating product", error: error });
+        const newProduct =  new product(data);
+
+        await  product.updateOne({productId: productId}, data);
+
+        res.status(201).json({message:  "product update successfully", product})
+
+
+        
+    }catch(error){
+        res.status(500).json({ message:  "Error creating  product", error: error});
+
     }
+
 }
 
-export async function getProductById(req , res) {
-    console.log("Get product by id api called")
+export async function getProductById(req,res) {
     try{
-        const productId= req.params.productId;
-        const product = await product.findOne({productId : productId});
+        const productId = req.params.productId;
+        const procuct = await product.findOne({productId: productId});
 
-        if(product == null){
-            res.status(404).json({message : "product not found"});
+        if(procuct == null){
+            res.status(404).json({message: "product not found"});
             return;
         }
-        if(!product.isVisible){
+        if(!procuct.isVisible){
             if(!isAdmin(req)){
-                res.status(404).json({message:"product not found."})
+                res.status(404).json({message: "product not found"});
                 return;
             }
+
         }
         res.status(200).json(product);
-
     }catch(error){
-        res.status(500).json({message : "Error fetching product", error : error});
-
+        res.status(500).json({message: "Error fetching  product", error: error});
     }
-
+    
 }
-    export async function searchProducts(req, res) {
-    }

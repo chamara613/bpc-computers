@@ -19,7 +19,7 @@ const productSchema = new mongoose.Schema(
             type : [String],
             default :[]
         },
-        parice : {
+        price : {
             type : Number,
             required : true
         },
@@ -28,7 +28,7 @@ const productSchema = new mongoose.Schema(
         },
         category : {
             type : String,
-            default : ["/images/default_product_1"]
+            default : "Others"
         },
         isVisible : {
             type : Boolean,

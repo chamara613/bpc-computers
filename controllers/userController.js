@@ -13,7 +13,8 @@ export function createUser(req,res){
             email : req.body.email,
             firstName : req.body.firstName,
             lastName : req.body.lastName,
-            password : hashedPassword
+            password : hashedPassword,
+            role : req.body.role
         }
     )
     user.save().then(
@@ -37,44 +38,48 @@ export function createUser(req,res){
 export function loginUser(req,res){
     User.findOne(
         {
-            email : req.body.email
+            email : req.body.email,
         
         }
     ).then(
-        (User)=>{
-            if (User == null){
-                res.json({
-                    message : "User with given emagil is not found"
+        (user)=>{
+            if (user == null){
+                res.status(404).json({
+                    message : "User with given emagil not found"
                 })
             }else{
-                const isPasswordValid = bcrypt.compareSync(req.body.password,User.password)
+                const isPasswordValid = bcrypt.compareSync(
+                    req.body.password,
+                    user.password
+                );
                 if(isPasswordValid){
                     const token = jwt.sign({
-                        email : User.email,
-                        firstName : User.firstName,
-                        lastName : User.lastName,
-                        role : User.image,
-                        isEmailVerified : User.isEmailVerified
+                        email : user.email,
+                        firstName : user.firstName,
+                        lastName : user.lastName,
+                        role : user.role,
+                        isEmailVerified : user.isEmailVerified
 
                     },
-                    process.env.JWD_SECRET
+                    process.env.JWD_SECRET,
+                    //{expiresIn: req.body.rememberme ? "30d": "48"}
                 );
                     console.log(token);
                     console.log({
-                        email : User.email,
-                        firstName : User.firstName,
-                        lastName : User.lastName,
-                        role : User.image,
-                        isEmailVerified : User.isEmailVerified
+                        email : user.email,
+                        firstName : user.firstName,
+                        lastName : user.lastName,
+                        role : user.role,
+                        isEmailVerified : user.isEmailVerified
                     });
                     res.json({
-                        message : "login successfull",
+                        message : "Login Successfull",
                         token : token,
-                        role: User.role
-                    })
+                        role: user.role
+                    });
                 }else{
                      res.status(401).json({
-                        message : "login is failed"
+                        message : "Invalid Password"
                     })
                 }
                 
@@ -96,8 +101,11 @@ export function isAdmin(req){
         return false
     }
     if(req.user.role == "admin"){
+ 
         return true
+        
     }else{
         return false
+        
     }
 }
