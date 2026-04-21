@@ -61,7 +61,7 @@ export function loginUser(req,res){
                         isEmailVerified : user.isEmailVerified
 
                     },
-                    process.env.JWD_SECRET,
+                    process.env.JWT_SECRET,
                     //{expiresIn: req.body.rememberme ? "30d": "48"}
                 );
                     console.log(token);

@@ -36,9 +36,13 @@ export async function createProduct(req,res){
         data.price = req.body.price;
         data.labelledprice = req.body.labelledprice || req.body.price
         data.category = req.body.category || ""
-       // data.images  = req.body.
-        data.brand = req.body.brand || "Generic"
-        data.model = req.body.model ||  "Standard"
+        data.images  = req.body.images  || [
+            "/images/default-product-1.png",
+            "/images/default-product-2.png",
+        ];
+        data.isVisible = req.body.isVisible;
+        data.brand = req.body.brand || "Generic";
+        data.model = req.body.model ||  "Standard";
 
         const newProduct =  new product(data);
 
