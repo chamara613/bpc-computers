@@ -34,7 +34,7 @@ export async function createProduct(req,res){
             return;
         }
         data.price = req.body.price;
-        data.labelledprice = req.body.labelledprice || req.body.price
+        data.labelledPrice = req.body.labelledPrice || req.body.price
         data.category = req.body.category || ""
         data.images  = req.body.images  || [
             "/images/default-product-1.png",
@@ -83,7 +83,7 @@ export async  function  deleteProduct(req,res){
     }
     try{
 
-        const productId = req.para.productId;
+        const productId = req.params.productId;
         await product.deleteOne({ productId: productId});
         res.status(200).json({message: "product deleted successfully"});
 
@@ -117,9 +117,9 @@ export async function updateProduct(req,res){
             return;
         }
         data.price = req.body.price;
-        data.labelledprice = req.body.labelledprice || req.body.price
+        data.labelledPrice = req.body.labelledPrice || req.body.price
         data.category = req.body.category || ""
-       // data.images  = req.body.
+        data.images  = req.body.images
         data.brand = req.body.brand || "Generic"
         data.model = req.body.model ||  "Standard"
 

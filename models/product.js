@@ -23,7 +23,7 @@ const productSchema = new mongoose.Schema(
             type : Number,
             required : true
         },
-        laballedprice : {
+        labelledPrice : {
             type : Number
         },
         category : {
