@@ -65,6 +65,10 @@ export function loginUser(req,res){
                     message : "User with given emagil not found"
                 })
             }else{
+                if(user.isBlocked){
+                    res.status(403).json({message : "You account is blocked. pleas contact support for more infomation"})
+                    return
+                }
                 const isPasswordValid = bcrypt.compareSync(
                     req.body.password,
                     user.password
@@ -588,128 +592,418 @@ export async function verifyOTP(req, res) {
 
 // }
 // 
+// export async function googleLogin(req, res) {
+
+//     try{
+
+//         const googleResponse =
+//             await axios.get(
+//                 "https://www.googleapis.com/oauth2/v3/userinfo",
+//                 {
+//                     headers : {
+//                         Authorization :
+//                         "Bearer " +
+//                         req.body.token
+//                     }
+//                 }
+//             )
+
+//         console.log(
+//             "Google User Data:",
+//             googleResponse.data
+//         )
+
+//         let user =
+//             await User.findOne({
+//                 email :
+//                 googleResponse.data.email
+//             })
+
+//         // create user if not exists
+//         if(user == null){
+
+//             user = new User({
+
+//                 email :
+//                 googleResponse.data.email,
+
+//                 firstName :
+//                 googleResponse.data.given_name,
+
+//                 lastName :
+//                 googleResponse.data.family_name,
+
+//                 password :
+//                 "google-login",
+
+//                 image :
+//                 googleResponse.data.picture,
+
+//                 isEmailVerified :
+//                 true
+
+//             })
+
+//             await user.save()
+
+//         }
+
+//         // generate token
+//         const token =
+//             jwt.sign(
+
+//                 {
+//                     email :
+//                     user.email,
+
+//                     firstName :
+//                     user.firstName,
+
+//                     lastName :
+//                     user.lastName,
+
+//                     role :
+//                     user.role,
+
+//                     image :
+//                     user.image,
+
+//                     isEmailVerified :
+//                     user.isEmailVerified
+
+//                 },
+
+//                 process.env.JWT_SECRET,
+
+//                 {
+//                     expiresIn :
+//                     req.body.rememberme
+//                     ?
+//                     "30d"
+//                     :
+//                     "48h"
+//                 }
+
+//             )
+  
+
+//         return res.json({
+
+//             message :
+//             "Google login successful",
+
+//             token :
+//             token,
+
+//             role :
+//             user.role
+
+//         })
+
+//     }catch(error){
+
+//         console.log(error)
+
+//         return res.status(500).json({
+
+//             message :
+//             "Error logging in with Google",
+
+//             error :
+//             error.message
+
+//         })
+
+//     }
+
+// }
+
 export async function googleLogin(req, res) {
 
-    try{
+    try {
 
         const googleResponse =
             await axios.get(
                 "https://www.googleapis.com/oauth2/v3/userinfo",
                 {
-                    headers : {
-                        Authorization :
-                        "Bearer " +
-                        req.body.token
+                    headers: {
+                        Authorization:
+                            "Bearer " +
+                            req.body.token
                     }
                 }
-            )
+            );
 
         console.log(
             "Google User Data:",
             googleResponse.data
-        )
+        );
 
+        // Find user
         let user =
             await User.findOne({
-                email :
-                googleResponse.data.email
-            })
+                email:
+                    googleResponse.data.email
+            });
 
-        // create user if not exists
-        if(user == null){
+        // Create user if not exists
+        if (user == null) {
 
             user = new User({
 
-                email :
-                googleResponse.data.email,
+                email:
+                    googleResponse.data.email,
 
-                firstName :
-                googleResponse.data.given_name,
+                firstName:
+                    googleResponse.data.given_name,
 
-                lastName :
-                googleResponse.data.family_name,
+                lastName:
+                    googleResponse.data.family_name,
 
-                password :
-                "google-login",
+                password:
+                    "google-login",
 
-                image :
-                googleResponse.data.picture,
+                image:
+                    googleResponse.data.picture,
 
-                isEmailVerified :
-                true
+                role:
+                    "customer",
 
-            })
+                isBlocked:
+                    false,
 
-            await user.save()
+                isEmailVerified:
+                    true
 
+            });
+
+            await user.save();
         }
 
-        // generate token
-        const token =
-            jwt.sign(
+        // BLOCKED USER CHECK
+        if (user.isBlocked) {
 
-                {
-                    email :
+            return res.status(403).json({
+
+                message:
+                    "You account is blocked. pleas contact support for more infomation"
+
+            });
+        }
+
+        // Generate JWT Token
+        const token = jwt.sign(
+
+            {
+                email:
                     user.email,
 
-                    firstName :
+                firstName:
                     user.firstName,
 
-                    lastName :
+                lastName:
                     user.lastName,
 
-                    role :
+                role:
                     user.role,
 
-                    image :
+                image:
                     user.image,
 
-                    isEmailVerified :
-                    user.isEmailVerified
+                isEmailVerified:
+                    user.isEmailVerified,
 
-                },
+                isBlocked:
+                    user.isBlocked
+            },
 
-                process.env.JWT_SECRET,
+            process.env.JWT_SECRET,
 
-                {
-                    expiresIn :
+            {
+                expiresIn:
                     req.body.rememberme
-                    ?
-                    "30d"
-                    :
-                    "48h"
-                }
+                        ? "30d"
+                        : "48h"
+            }
 
-            )
-  
+        );
 
         return res.json({
 
-            message :
-            "Google login successful",
+            message:
+                "Google login successful",
 
-            token :
-            token,
+            token:
+                token,
 
-            role :
-            user.role
+            role:
+                user.role
 
-        })
+        });
 
-    }catch(error){
+    } catch (error) {
 
-        console.log(error)
+        console.log(error);
 
         return res.status(500).json({
 
-            message :
-            "Error logging in with Google",
+            message:
+                "Error logging in with Google",
 
-            error :
-            error.message
+            error:
+                error.message
 
-        })
+        });
 
     }
+}
 
+export async function getAllUsers(req, res) {
+    if (!isAdmin(req)) {
+        res.status(403).json({
+            message: "Forbidden"
+        });
+        return;
+    }
+
+    try {
+        const pageSizeInString = req.params.pageSize || "10";
+        const pageNumberInString = req.params.pageNumber || "1";
+
+        const pageSize = parseInt(pageSizeInString);
+        const pageNumber = parseInt(pageNumberInString);
+
+        const numberOfUsers = await User.countDocuments();
+        const numberOfPages = Math.ceil(numberOfUsers / pageSize);
+
+        const users = await User.find({})
+            .sort({ date: -1 })
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize);
+
+        res.json({
+            users: users,
+            totalPages: numberOfPages
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Error getting users",
+            error: error.message
+        });
+    }
+}
+
+export async function blockOrUnblockUser(req, res) {
+
+    if(!isAdmin(req)){
+        res.status(403).json(
+            {message : "Forbidden"}
+        )
+        return
+    }
+    const email = req.body.email
+
+    if(req.user.email == email){
+        res.status(400).json({
+            message : "You cannot block yourself"
+        })
+        return
+    }
+    try{
+        const user = await User.findOne({email : email})
+
+        if(user == null){
+            res.status(404).json({message : "User with given email not found"})
+            return
+        }
+        await User.updateOne({email : email}, {isBlocked : !user.isBlocked})
+        res.json({message : user.isBlocked ? "User unblocked successfully": "User blocked successfully"})
+    }catch(error){
+        res.status(500).json({message : "Error blocking/unblocing user", error : error})
+    }
+    
+}
+
+// export async function changeRole(req, res) {
+
+//     if(!isAdmin(req)){
+//         res.status(403).json({
+//             message : "Forbidden"
+//         })
+//         return
+//     }
+//     const email = req.body.email
+    
+//     if(req.user.email == email){
+//         res.status(400).json({
+//             message : "you cannot chenge you own role"
+//         })
+//         return
+//     }
+//     try{
+//         const user = await User.findOne({email : email})
+
+//     if(user == null){
+//         res.status(404).json({message : "User with given email not found"})
+//         return
+//     }
+//     }catch(error){
+//         res.status(500).json({message : "Error chenging user role", error : error})
+//     }
+    
+// } 
+export async function changeRole(req, res) {
+
+    if (!isAdmin(req)) {
+        res.status(403).json({
+            message: "Forbidden"
+        });
+        return;
+    }
+
+    const email = req.body.email;
+
+    if (req.user.email == email) {
+        res.status(400).json({
+            message: "You cannot change your own role"
+        });
+        return;
+    }
+
+    try {
+
+        const user = await User.findOne({
+            email: email
+        });
+
+        if (user == null) {
+            res.status(404).json({
+                message: "User not found"
+            });
+            return;
+        }
+
+        const newRole =
+            user.role === "admin"
+                ? "customer"
+                : "admin";
+
+        await User.updateOne(
+            { email: email },
+            { role: newRole }
+        );
+
+        res.json({
+            message:
+                `User role changed to ${newRole}`
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "Error changing role",
+            error: error.message
+        });
+    }
 }
