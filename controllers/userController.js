@@ -21,6 +21,52 @@ const transporter = nodemailer.createTransport({
 })
 
 export function createUser(req,res){
+    
+    // Validate required fields
+    if (!req.body.email || !req.body.email.trim()) {
+        res.status(400).json({
+            message: "Email is required"
+        });
+        return;
+    }
+    
+    if (!req.body.firstName || !req.body.firstName.trim()) {
+        res.status(400).json({
+            message: "First name is required"
+        });
+        return;
+    }
+    
+    if (!req.body.lastName || !req.body.lastName.trim()) {
+        res.status(400).json({
+            message: "Last name is required"
+        });
+        return;
+    }
+    
+    if (!req.body.password || !req.body.password.trim()) {
+        res.status(400).json({
+            message: "Password is required"
+        });
+        return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(req.body.email)) {
+        res.status(400).json({
+            message: "Invalid email format"
+        });
+        return;
+    }
+    
+    // Validate password length
+    if (req.body.password.length < 6) {
+        res.status(400).json({
+            message: "Password must be at least 6 characters long"
+        });
+        return;
+    }
 
     const hashedPassword = bcrypt.hashSync(req.body.password,10)
 
@@ -52,6 +98,22 @@ export function createUser(req,res){
 }
  
 export function loginUser(req,res){
+    
+    // Validate required fields
+    if (!req.body.email || !req.body.email.trim()) {
+        res.status(400).json({
+            message: "Email is required"
+        });
+        return;
+    }
+    
+    if (!req.body.password || !req.body.password.trim()) {
+        res.status(400).json({
+            message: "Password is required"
+        });
+        return;
+    }
+    
     User.findOne(
         {
             email : req.body.email,
