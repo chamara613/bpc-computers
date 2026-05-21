@@ -1,4 +1,3 @@
-
 import User from "../models/user.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
@@ -136,84 +135,7 @@ export function getUser(req, res) {
         isEmailVerified: req.user.isEmailVerified,
     })
 }
-// export async function updateUserProfile(req, res) {
 
-//     if(req.user == null){
-//         res.status(401).json({
-//             message: "Unauthorized"
-//         });
-//         return;
-//     }
-
-//     try{
-
-//         await User.updateOne(
-//             { email: req.user.email },
-//             {
-//                 firstName: req.body.firstName,
-//                 lastName: req.body.lastName,
-//                 image: req.body.image
-//             }
-//         );
-//         const user = await user.findOne({email : req.user.email})
-//         const token = jwt.sign({
-//                         email : user.email,
-//                         firstName : user.firstName,
-//                         lastName : user.lastName,
-//                         role : user.role,
-//                         image: user.image,
-//                         isEmailVerified : user.isEmailVerified
-
-//                     },
-//                     process.env.JWT_SECRET,
-//                     //{expiresIn: req.body.rememberme ? "30d": "48"}
-//                 );
-
-//         res.json({
-//             message: "Profile updated successfully", token : token
-//         });
-
-//     }catch(error){
-
-//         res.status(500).json({
-//             message: "Error updating profile",
-//             error: error.message
-//         });
-//     }
-// }
-
-
-// export async function changeUserPassword(req, res) {
-
-//     if(req.user == null){
-//         res.status(401).json({
-//             message: "Unauthorized"
-//         });
-//         return;
-//     }
-
-//     try{
-
-//         const hashedPassword =
-//             bcrypt.hashSync(req.body.password, 10);
-
-//         await User.updateOne(
-//             { email: req.user.email },
-//             { password: hashedPassword }
-//         );
-
-//         res.json({
-//             message: "Password changed successfully"
-//         });
-
-//     }catch(error){
-
-//         res.status(500).json({
-//             message: "Error changing password",
-//             error: error.message
-//         });
-//     }
-// }
 
 export async function updateUserProfile(req, res) {
 
@@ -322,39 +244,6 @@ export function isAdmin(req){
     }
 }
 
-// export async function sendOTP(req, res){
-//     try{
-//         if(user == null){
-//         const user = await user.findOne({email : req.body.email})
-//         return
-//     }
-//     //generate and send OTP logic here
-//     //otp between 10000 and 99999
-//     const otp = Math.floor(10000 + Math.random() * 90000)
-    
-//     const newOTP = new OTP({
-//         email : req.body.email,
-//         otp : otp
-//     })
-//     await newOTP.save()
-//     const message = {
-//         from : "pasiduc79@gamail.com",
-//         to : req.body.email,
-//         subject : "Your OTP for password reset ",
-//         text : "Your OTP for password reset is " + otp + ", It is valid for 10 minutes."
-//     }
-//     transporter.sendMail(message, (error, info)) => {
-//         if(error){
-//             console.log("Error sending email", error)
-//             res.status(500).json({ message : "Error sending OTP", error : error})
-//         }else{
-//             console.log("Email sent successfully", info.response)
-//         }
-//     }
-// }catch(error){
-//     res.status(500).json({message : "Error sending OTP", error : error})
-// }
-// }
 export async function sendOTP(req, res){
 
     try{
@@ -433,31 +322,6 @@ export async function sendOTP(req, res){
 
 }
 
-// export async function verifyOTP(req, res) {
-//     try{
-//         const otpCode = req.body.otp
-//         const email = req.body.email
-//         const newPassword = req.body.newPassword
-
-//         const otpRecord = await OTP.findOne({email : email})
-
-//         if(otpRecord == null){
-//             res.status(404).json({message : "OTP not found for the given email"})
-//             return
-//         }
-//         if(otpRecord.otp != otpCode){
-//             req.status(400).json({ message : "Invalid OTP"})
-//             return
-//         }
-//         const hashedPassword = bcrypt.hashSync(nowPassword, 10);
-
-//         await User.updateOne({email : email})
-
-//     }catch(error){
-//         res.status(500).json({message : "Error verifiying OTP", error : error})
-//     }
-    
-// }
 export async function verifyOTP(req, res) {
 
     try{
@@ -534,189 +398,6 @@ export async function verifyOTP(req, res) {
     }
 
 }
-
-// export async function googleLogin(req, res) {
-
-//     try{
-//         await axios.get("http://www.googleapis.com/oauth2/v3/userinfo",{
-//             headers : {
-//                 Authorization : "Bearer "+req.body.token
-//             }
-//         })
-//         console.log(googleResponse)
-//     }catch(error){
-//         res.status(500),json({message : "Error logging in with Google", error: error})
-//     }
-    
-// }
-// export async function googleLogin(req, res) {
-
-//     try{
-
-//         const googleResponse =
-//             await axios.get(
-//                 "https://www.googleapis.com/oauth2/v3/userinfo",
-//                 {
-//                     headers : {
-//                         Authorization :"Bearer " +req.body.token}
-//                 }
-//             )
-
-// console.log(
-//     "Google User Data:",
-//     googleResponse.data
-// )
-
-// return res.json({
-//     data :
-//     googleResponse.data
-// })
-
-//         res.json({
-//             message :
-//             "Google login success",
-//             data :
-//             googleResponse.data
-//         })
-
-//     }catch(error){
-
-//         res.status(500).json({
-//             message :
-//             "Error logging in with Google",
-//             error :
-//             error.message
-//         })
-
-//     }
-
-// }
-// 
-// export async function googleLogin(req, res) {
-
-//     try{
-
-//         const googleResponse =
-//             await axios.get(
-//                 "https://www.googleapis.com/oauth2/v3/userinfo",
-//                 {
-//                     headers : {
-//                         Authorization :
-//                         "Bearer " +
-//                         req.body.token
-//                     }
-//                 }
-//             )
-
-//         console.log(
-//             "Google User Data:",
-//             googleResponse.data
-//         )
-
-//         let user =
-//             await User.findOne({
-//                 email :
-//                 googleResponse.data.email
-//             })
-
-//         // create user if not exists
-//         if(user == null){
-
-//             user = new User({
-
-//                 email :
-//                 googleResponse.data.email,
-
-//                 firstName :
-//                 googleResponse.data.given_name,
-
-//                 lastName :
-//                 googleResponse.data.family_name,
-
-//                 password :
-//                 "google-login",
-
-//                 image :
-//                 googleResponse.data.picture,
-
-//                 isEmailVerified :
-//                 true
-
-//             })
-
-//             await user.save()
-
-//         }
-
-//         // generate token
-//         const token =
-//             jwt.sign(
-
-//                 {
-//                     email :
-//                     user.email,
-
-//                     firstName :
-//                     user.firstName,
-
-//                     lastName :
-//                     user.lastName,
-
-//                     role :
-//                     user.role,
-
-//                     image :
-//                     user.image,
-
-//                     isEmailVerified :
-//                     user.isEmailVerified
-
-//                 },
-
-//                 process.env.JWT_SECRET,
-
-//                 {
-//                     expiresIn :
-//                     req.body.rememberme
-//                     ?
-//                     "30d"
-//                     :
-//                     "48h"
-//                 }
-
-//             )
-  
-
-//         return res.json({
-
-//             message :
-//             "Google login successful",
-
-//             token :
-//             token,
-
-//             role :
-//             user.role
-
-//         })
-
-//     }catch(error){
-
-//         console.log(error)
-
-//         return res.status(500).json({
-
-//             message :
-//             "Error logging in with Google",
-
-//             error :
-//             error.message
-
-//         })
-
-//     }
-
-// }
 
 export async function googleLogin(req, res) {
 
@@ -925,34 +606,7 @@ export async function blockOrUnblockUser(req, res) {
     
 }
 
-// export async function changeRole(req, res) {
 
-//     if(!isAdmin(req)){
-//         res.status(403).json({
-//             message : "Forbidden"
-//         })
-//         return
-//     }
-//     const email = req.body.email
-    
-//     if(req.user.email == email){
-//         res.status(400).json({
-//             message : "you cannot chenge you own role"
-//         })
-//         return
-//     }
-//     try{
-//         const user = await User.findOne({email : email})
-
-//     if(user == null){
-//         res.status(404).json({message : "User with given email not found"})
-//         return
-//     }
-//     }catch(error){
-//         res.status(500).json({message : "Error chenging user role", error : error})
-//     }
-    
-// } 
 export async function changeRole(req, res) {
 
     if (!isAdmin(req)) {

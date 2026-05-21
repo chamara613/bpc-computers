@@ -90,11 +90,7 @@ export async function createOrder(req, res) {
                 return
             }
 
-            // if(product.qty < item.qty){
-
-            //     res.status(404).json({ message : "Only " + product.qty + " items available for product with id " + item.productId + ". Please adjust the quantity in your cart and try again." })
-            //     return
-            // }
+            
 
             orderData.items.push({
                 productId : product.productId,
@@ -111,20 +107,14 @@ export async function createOrder(req, res) {
         const order = new Order(orderData);
         await order.save();
 
-        //reduce the qty from the products collection
-        // for(let i = 0; i< orderData.items.length; i++){
-
-        //     const item = orderData.items[i]
-        //     await Product.updateOne({ productId : item.productId }, { $inc : { qty : -item.qty } })
-        // }
-
+      
         res.status(201).json({ message: "Order created successfully", orderId : orderData.orderId });
 
 	} catch (error) {
 		console.log("Error creating order", error);
 		res.status(500).json({ message: "Error creating order", error: error });
 	}
-	//
+	
 }
 
 export async function getOrders(req,res){
